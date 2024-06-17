@@ -7,7 +7,3 @@ if (WIN32)
 else ()
     include(cmake/libmodbus-linux.cmake)
 endif ()
-
-#add_executable(modbus_test)
-#target_sources(modbus_test PRIVATE main.cpp)
-#target_link_libraries(modbus_test modbus)

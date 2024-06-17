@@ -9,7 +9,7 @@ set(LIBMODBUS_VERSION_MAJOR)
 set(LIBMODBUS_VERSION_MINOR)
 set(LIBMODBUS_VERSION_MICRO)
 
-set(version_file_path "${CMAKE_SOURCE_DIR}/configure.ac")
+set(version_file_path "${CMAKE_CURRENT_SOURCE_DIR}/configure.ac")
 if (EXISTS "${version_file_path}")
     file(STRINGS "${version_file_path}" version REGEX "m4_define\\(\\[libmodbus_version_(major|minor|micro)\\]")
     string(REGEX REPLACE ".*_major\\], \\[([0-9]*)\\]\\).*" "\\1" major "${version}")
