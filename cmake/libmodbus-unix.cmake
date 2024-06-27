@@ -3,8 +3,8 @@ if (NOT UNIX)
 endif ()
 
 include(ExternalProject)
-set(MODBUS_DIR ${CMAKE_SOURCE_DIR})
-set(MODBUS_BIN ${CMAKE_BINARY_DIR}/libmodbus)
+set(MODBUS_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set(MODBUS_BIN ${CMAKE_CURRENT_BINARY_DIR}/libmodbus)
 set(MODBUS_STATIC_LIB ${MODBUS_BIN}/lib/libmodbus.a)
 set(MODBUS_INCLUDES ${MODBUS_BIN}/include)
 
