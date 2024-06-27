@@ -23,27 +23,34 @@ if (EXISTS "${version_file_path}")
     endif ()
 endif ()
 
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/win32/config.h.win32 DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/generated)
-file(RENAME ${CMAKE_CURRENT_BINARY_DIR}/generated/config.h.win32 ${CMAKE_CURRENT_BINARY_DIR}/generated/config.h)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/modbus-version.h.in ${CMAKE_CURRENT_BINARY_DIR}/generated-public/modbus-version.h)
-
 # Setup public and private source files
 
-set(public_headers modbus.h modbus-rtu.h modbus-tcp.h)
-set(generated_public_headers)
-foreach (file ${public_headers})
-    file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/src/${file}" DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/generated-public)
-    list(APPEND generated_public_headers "${CMAKE_CURRENT_BINARY_DIR}/generated-public/${file}")
-endforeach ()
-list(APPEND generated_public_headers ${CMAKE_CURRENT_BINARY_DIR}/generated-public/modbus-version.h)
+set(public_headers_source_dir ${CMAKE_CURRENT_SOURCE_DIR}/src)
+set(public_headers_dest_dir ${CMAKE_CURRENT_BINARY_DIR}/generated-public)
+set(private_sources_source_dir ${CMAKE_CURRENT_SOURCE_DIR}/src)
+set(private_sources_dest_dir ${CMAKE_CURRENT_BINARY_DIR}/generated)
 
-set(private_sources modbus.c modbus-private.h modbus-data.c modbus-rtu.c modbus-rtu-private.h modbus-tcp.c modbus-tcp-private.h)
+set(generated_public_headers)
 set(generated_private_sources)
-foreach (file ${private_sources})
-    file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/src/${file}" DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/generated)
-    list(APPEND generated_private_sources "${CMAKE_CURRENT_BINARY_DIR}/generated/${file}")
+
+set(public_headers modbus.h modbus-rtu.h modbus-tcp.h)
+set(private_sources modbus.c modbus-private.h modbus-data.c modbus-rtu.c modbus-rtu-private.h modbus-tcp.c modbus-tcp-private.h)
+
+file(COPY ${private_sources_source_dir}/win32/config.h.win32 DESTINATION ${private_sources_dest_dir})
+file(RENAME ${private_sources_dest_dir}/config.h.win32 ${private_sources_dest_dir}/config.h)
+list(APPEND generated_private_sources ${private_sources_dest_dir}/config.h)
+configure_file(${public_headers_source_dir}/modbus-version.h.in ${public_headers_dest_dir}/modbus/modbus-version.h)
+list(APPEND generated_public_headers ${public_headers_dest_dir}/modbus/modbus-version.h)
+
+foreach (file ${public_headers})
+    file(COPY "${public_headers_source_dir}/${file}" DESTINATION ${public_headers_dest_dir}/modbus)
+    list(APPEND generated_public_headers "${public_headers_dest_dir}/modbus/${file}")
 endforeach ()
-list(APPEND generated_private_sources ${CMAKE_CURRENT_BINARY_DIR}/generated/config.h)
+
+foreach (file ${private_sources})
+    file(COPY "${private_sources_source_dir}/${file}" DESTINATION ${private_sources_dest_dir})
+    list(APPEND generated_private_sources "${private_sources_dest_dir}/${file}")
+endforeach ()
 
 # Create library target
 
@@ -51,7 +58,7 @@ add_library(modbus_shared SHARED)
 
 set_target_properties(modbus_shared PROPERTIES OUTPUT_NAME libmodbus)
 target_compile_definitions(modbus_shared PRIVATE DLLBUILD)
-target_include_directories(modbus_shared PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/generated PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/generated-public)
+target_include_directories(modbus_shared PRIVATE ${private_sources_dest_dir} PUBLIC ${public_headers_dest_dir})
 target_sources(modbus_shared PRIVATE ${generated_private_sources} PUBLIC ${generated_public_headers})
 
 target_link_libraries(modbus_shared PRIVATE ws2_32)
