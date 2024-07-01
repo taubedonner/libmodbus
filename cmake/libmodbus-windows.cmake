@@ -58,7 +58,7 @@ add_library(modbus_shared SHARED)
 
 set_target_properties(modbus_shared PROPERTIES OUTPUT_NAME libmodbus)
 target_compile_definitions(modbus_shared PRIVATE DLLBUILD)
-target_include_directories(modbus_shared PRIVATE ${private_sources_dest_dir} PUBLIC ${public_headers_dest_dir})
+target_include_directories(modbus_shared PRIVATE ${private_sources_dest_dir} ${public_headers_dest_dir}/modbus PUBLIC ${public_headers_dest_dir})
 target_sources(modbus_shared PRIVATE ${generated_private_sources} PUBLIC ${generated_public_headers})
 
 target_link_libraries(modbus_shared PRIVATE ws2_32)
